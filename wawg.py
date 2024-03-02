@@ -10,31 +10,33 @@ def baca_vcf(file):
     vcard = vobject.readOne(data)
     return vcard.contents['fn']
 
-# Fungsi untuk memasukkan kontak ke dalam grup yang sudah ada
-def tambahkan_ke_grup(nama_grup, kontak):
-    # Path ke WebDriver (saya menggunakan Chrome, sesuaikan dengan browser Anda)
-    driver = webdriver.Chrome('path/to/chromedriver')
+# Fungsi untuk membuat grup baru
+def buat_grup(nama_grup, kontak):
+    # Path ke WebDriver (GeckoDriver)
+    driver = webdriver.Firefox(executable_path='/path/to/geckodriver')
 
     # Buka WhatsApp Web
     driver.get("https://web.whatsapp.com/")
     input("Tekan Enter setelah Anda login di WhatsApp Web")
 
-    # Cari nama grup
+    # Klik tombol buat grup
+    new_chat_button = driver.find_element_by_xpath('//div[@title="Obrolan Baru"]')
+    new_chat_button.click()
+    time.sleep(2)
+
+    # Pilih "Grup"
+    grup_button = driver.find_element_by_xpath('//span[@title="Grup"]')
+    grup_button.click()
+    time.sleep(2)
+
+    # Masukkan nama grup
     search_box = driver.find_element_by_xpath('//div[@contenteditable="true"][@data-tab="3"]')
     search_box.send_keys(nama_grup)
     time.sleep(2)
-
-    # Klik grup
-    group = driver.find_element_by_xpath(f'//span[@title="{nama_grup}"]')
-    group.click()
+    search_box.send_keys(Keys.RETURN)
     time.sleep(2)
 
-    # Klik tombol tambah anggota
-    add_button = driver.find_element_by_xpath('//div[@title="Tambah anggota"]')
-    add_button.click()
-    time.sleep(2)
-
-    # Masukkan kontak ke dalam kotak pencarian
+    # Tambahkan kontak ke grup
     for k in kontak:
         search_box = driver.find_element_by_xpath('//div[@contenteditable="true"][@data-tab="3"]')
         search_box.send_keys(k)
@@ -44,9 +46,9 @@ def tambahkan_ke_grup(nama_grup, kontak):
         contact.click()
         time.sleep(1)
 
-    # Klik tombol tambah
-    add_button = driver.find_element_by_xpath('//div[@class="_3s1D4"]')
-    add_button.click()
+    # Klik tombol buat
+    create_button = driver.find_element_by_xpath('//span[@data-testid="arrow"]')
+    create_button.click()
     time.sleep(2)
 
     driver.quit()
@@ -55,4 +57,4 @@ def tambahkan_ke_grup(nama_grup, kontak):
 nama_grup = "Nama Grup Anda"
 file_vcf = "path/to/your/contacts.vcf"  # Ganti dengan path ke file VCF Anda
 kontak = baca_vcf(file_vcf)
-tambahkan_ke_grup(nama_grup, kontak)
+buat_grup(nama_grup, kontak)
